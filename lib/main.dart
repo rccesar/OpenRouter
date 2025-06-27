@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/chat.dart';
 
 void main() {
   runApp(const MyHome());
@@ -76,7 +77,10 @@ class MyHomePage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
-                  // Ação do botão aqui
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChatScreen()),
+                  );
                 },
                 child: const Text("Continue"),
               ),
