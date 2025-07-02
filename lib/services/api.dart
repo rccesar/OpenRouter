@@ -1,34 +1,35 @@
-import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter/foundation.dart' show kDebugMode; 
 
 class ApiService {
-  final Dio _dio = Dio();
+  final String apiKey = 'AIzaSyCbdOveIYvedl6vnDtihLJcrf-c_CHOfYg';
+
+  late final GenerativeModel _model;
+
+  ApiService() {
+    _model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: apiKey,
+      httpClient: http.Client(),
+    );
+  }
 
   Future<String> sendMessage(String prompt) async {
-    final apiKey =
-        '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';
-
     try {
-      final response = await _dio.post(
-        'https://openrouter.ai/v1/chat/completions', 
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $apiKey',
-            'Content-Type': 'application/json',
-          },
-        ),
-        data: {
-          "model": "openai/gpt-4o-mini",
-          "messages": [
-            {"role": "user", "content": prompt},
-          ],
-          "temperature": 0.7,
-          "max_tokens": 1024,
-        },
-      );
+      final String promptEmPortugues =
+          "Responda em português do Brasil: $prompt";
 
-      return response.data['choices'][0]['message']['content'] as String;
+      final response = await _model.generateContent([
+        Content.text(promptEmPortugues), 
+      ]);
+
+      return response.text ?? '⚠️ Resposta vazia.';
     } catch (e) {
-      throw Exception('Erro ao chamar a API: $e');
+      if (kDebugMode) {
+        print('❌ Erro ao chamar Gemini: $e');
+      }
+      return '❌ Erro ao chamar Gemini: $e';
     }
   }
 }
